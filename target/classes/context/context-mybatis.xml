@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+		<!-- board mapper -->
+		<bean id="sqlSessionPost"
+			class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSource" />
+			<property name="mapperLocations"
+				value="classpath:/com/cubrid/board/post/*.xml" />
+		</bean>
+
+		<bean
+			class="egovframework.rte.psl.dataaccess.mapper.MapperConfigurer">
+			<property name="basePackage" value="com.cubrid.board.post" />
+			<property name="sqlSessionFactoryBeanName"
+				value="sqlSessionPost" />
+		</bean>
+
+		<bean id="dataSource"
+			class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="cubridDS" />
+		</bean>
+
+
+		<!-- stats mapper -->
+		<bean id="sqlSessionStats"
+			class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSourceStats" />
+			<property name="mapperLocations"
+				value="classpath:/com/cubrid/board/stats/*.xml" />
+		</bean>
+
+		<bean
+			class="egovframework.rte.psl.dataaccess.mapper.MapperConfigurer">
+			<property name="basePackage" value="com.cubrid.board.stats" />
+			<property name="sqlSessionFactoryBeanName"
+				value="sqlSessionStats" />
+		</bean>
+
+		<bean id="dataSourceStats"
+			class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="cubridStatsDS" />
+		</bean>
+		
+</beans>

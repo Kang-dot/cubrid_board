@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cubrid.board.stats.StatsMapper">
+
+	<resultMap id="statsResultMap" type="com.cubrid.board.stats.Stats">
+		<result column="STATS_DATE" property="statsDate" />
+		<result column="POST_NUM" property="postNum" />
+		<result column="TITLE" property="title" />
+		<result column="COUNTER" property="counter" />
+	</resultMap>
+	
+	<!-- sql 세팅 -->
+	
+	<select id="list" parameterType="com.cubrid.board.stats.Stats" resultMap="statsResultMap">
+		SELECT U.STATS_DATE, U.POST_NUM, P.TITLE, U.COUNTER
+		FROM POST P INNER JOIN
+		
+		(SELECT STATS_DATE, POST_NUM, COUNTER
+		FROM STATS
+		UNION
+		SELECT SYSDATE AS STATS_DATE, P.POST_NUM, NVL(P.COUNTER - S.COUNTER, P.COUNTER) AS COUNTER
+		FROM POST P LEFT OUTER JOIN (SELECT STATS_DATE, POST_NUM, COUNTER
+									FROM STATS
+									WHERE STATS_DATE = SYSDATE - 1) S
+		ON P.POST_NUM = S.POST_NUM) U
+		
+		ON P.POST_NUM = U.POST_NUM
+		<if test="statsDate != null">
+			WHERE U.STATS_DATE = TO_DATE(${statsDate},'YYYYMMDD')
+		</if>
+	</select>
+</mapper>
