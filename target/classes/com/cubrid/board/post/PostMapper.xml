@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.cubrid.board.post.PostMapper">
+	<resultMap id="postResultMap" type="com.cubrid.board.post.Post">
+		<result column="POST_NUM" property="postNum" />
+		<result column="POST_DATETIME" property="postDateTime" />
+		<result column="ID" property="id" />
+		<result column="TITLE" property="title" />
+		<result column="CONTENT" property="content" />
+		<result column="STATUS" property="status" />
+		<result column="EDITIED" property="edited" />
+		<result column="COUNTER" property="counter" />
+	</resultMap>
+	
+	<select id="select" parameterType="com.cubrid.board.post.Post" resultMap="postResultMap">
+		SELECT *
+		FROM POST
+		WHERE POST_NUM = #{postNum} AND status = 'N'
+	</select>
+	
+	<select id="selectNoIncr" parameterType="com.cubrid.board.post.Post" resultMap="postResultMap">
+		SELECT *
+		FROM POST
+		WHERE POST_NUM = #{postNum} AND status = 'N'
+	</select>
+	
+	<select id="list" parameterType="com.cubrid.board.post.Post" resultMap="postResultMap">
+		SELECT *
+		FROM POST
+		WHERE STATUS = 'N'
+	</select>
+	
+	<insert id="regist" parameterType="com.cubrid.board.post.Post">
+		INSERT INTO POST(ID, TITLE, CONTENT, STATUS, COUNTER, EDITED)	
+		VALUES(#{id}, #{title}, #{content}, 'N', 0, 'N')
+	</insert> 
+	
+	<update id="edit" parameterType="com.cubrid.board.post.Post">
+		UPDATE POST
+		SET CONTENT = #{content}, POST_DATETIME = SYSDATETIME, EDITED = 'Y'
+		WHERE POST_NUM = #{postNum} AND ID = #{id}
+	</update>
+	
+	<update id="delete" parameterType="com.cubrid.board.post.Post">
+		UPDATE POST
+		SET STATUS = 'D'
+		WHERE POST_NUM = #{postNum}
+	</update>
+	
+	<update id="addCount" parameterType="com.cubrid.board.post.Post">
+		UPDATE post
+		SET counter = counter + 1
+		WHERE POST_NUM = #{postNum};
+	</update>
+	
+	<select id="callProcedure">
+		CALL AddStats();
+	</select>
+	
+	<select id="sqlTest" resultType="_int">
+		select 1
+	</select>
+</mapper>
