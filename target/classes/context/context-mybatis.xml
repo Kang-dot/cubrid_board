@@ -10,6 +10,46 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+		
+		<!-- copy oracle mapper -->
+		<bean id="sqlSessionOracleCopy"
+			class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="OracleDataSource" />
+			<property name="mapperLocations"
+				value="classpath:/com/cubrid/copy/json/*.xml"/>
+		</bean>
+		
+		<bean
+			class="egovframework.rte.psl.dataaccess.mapper.MapperConfigurer">
+			<property name="basePackage" value="com.cubrid.copy.json" />
+			<property name="sqlSessionFactoryBeanName"
+				value="sqlSessionOracleCopy" />
+		</bean>
+
+		<bean id="OracleDataSource"
+			class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="oracleDS" />
+		</bean>
+		
+		<!-- copy cubrid mapper -->
+		<bean id="sqlSessionCopy"
+			class="org.mybatis.spring.SqlSessionFactoryBean">
+			<property name="dataSource" ref="dataSourceCopy" />
+			<property name="mapperLocations"
+				value="classpath:/com/cubrid/copy/general/*.xml"/>
+		</bean>
+		
+		<bean
+			class="egovframework.rte.psl.dataaccess.mapper.MapperConfigurer">
+			<property name="basePackage" value="com.cubrid.copy.general" />
+			<property name="sqlSessionFactoryBeanName"
+				value="sqlSessionCopy" />
+		</bean>
+
+		<bean id="dataSourceCopy"
+			class="org.springframework.jndi.JndiObjectFactoryBean">
+			<property name="jndiName" value="cubridCopyDS" />
+		</bean>
 
 		<!-- board mapper -->
 		<bean id="sqlSessionPost"
