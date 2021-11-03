@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cubrid.copy.general.GeneralMapper">
+	<resultMap id="OracleDatatMap" type="com.cubrid.copy.general.OracleData">
+		<result column="NUM" property="num" />
+		<result column="TITLE" property="title" />
+		<result column="AUTHOR" property="author" />
+		<result column="PUBLISHER" property="publisher" />
+		<result column="BOOK_YEAR" property="bookYear" />
+		<result column="SUBJECT_NUM" property="subjectNum" />
+		<result column="ISBN" property="ISBN" />
+		<result column="REGIST_DATE" property="registDate" />
+	</resultMap>
+
+	<!-- sql -->
+	<select id="select" parameterType="com.cubrid.copy.general.OracleData" resultMap="OracleDatatMap">
+		SELECT *
+		FROM copy_data
+		WHERE NUM = #{num}
+	</select>
+	
+	<select id="list" resultMap="OracleDatatMap">
+		SELECT *
+		FROM copy_data
+	</select>
+	
+	<insert id="regist" parameterType="com.cubrid.copy.general.OracleData">
+		INSERT INTO copy_data(NUM, TITLE, AUTHOR, PUBLISHER, BOOK_YEAR, ISBN, SUBJECT_NUM, REGIST_DATE)	
+		VALUES(#{num}, #{title}, #{author}, #{publisher}, #{bookYear}, #{subjectNum}, #{ISBN}, #{registDate})
+	</insert> 
+	
+	<delete id="delete" parameterType="com.cubrid.copy.general.OracleData">
+		DELETE FROM copy_data
+		WHERE NUM = #{num}
+	</delete>
+	
+	<update id="dropTable">
+		DROP TABLE copy_data
+	</update>
+	
+	<update id="createTable">
+		CREATE TABLE "copy_data" (
+			"NUM" int PRIMARY KEY,
+			"TITLE" varchar(500),
+			"AUTHOR" varchar(500),
+			"PUBLISHER" varchar(500),
+			"BOOK_YEAR" int,
+			"ISBN" varchar(50),
+			"SUBJECT_NUM" double,
+			"REGIST_DATE" date
+		)
+	</update>
+	
+	<update id="createIndex">
+		CREATE INDEX title_ISBN_index 
+		ON copy_data (title, ISBN)
+	</update>
+	
+	<insert id="jsonOracleCopyData">
+		INSERT INTO copy_data 
+		SELECT * FROM JSON_TABLE(
+			JSON_QUERY_LINK('select * from copy_data')
+						,'$.*' COLUMNS (NESTED PATH '$' COLUMNS (NUM int path '$.c1'
+																, TITLE varchar path '$.c2'
+																, AUTHOR varchar path '$.c3'
+																, PUBLISHER varchar path '$.c4'
+																, BOOK_YEAR int path '$.c5'
+																, ISBN varchar path '$.c6'
+																, SUBJECT_NUM double path '$.c7'
+																, REGIST_DATE date path '$.c8'))) AS copy_data
+	</insert>
+</mapper>
