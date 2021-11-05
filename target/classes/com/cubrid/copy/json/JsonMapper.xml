@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cubrid.copy.json.JsonMapper">
+	<resultMap id="OracleDatatMap" type="com.cubrid.copy.general.OracleData">
+		<result column="NUM" property="num" />
+		<result column="TITLE" property="title" />
+		<result column="AUTHOR" property="author" />
+		<result column="PUBLISHER" property="publisher" />
+		<result column="BOOK_YEAR" property="bookYear" />
+		<result column="SUBJECT_NUM" property="subjectNum" />
+		<result column="ISBN" property="ISBN" />
+		<result column="REGIST_DATE" property="registDate" />
+	</resultMap>
+	
+	<!-- sql -->
+	<select id="list" resultMap="OracleDatatMap">
+		SELECT *
+		FROM copy_data
+	</select>
+	
+	<select id="jsonList" resultType="string">
+		SELECT JSON_OBJECT (
+			KEY 'num' IS c.num,
+			KEY 'title' IS c.title,
+			KEY 'author' IS c.author,
+			KEY 'publisher' IS c.publisher,
+			KEY 'book_year' IS c.book_year,
+			KEY 'ISBN' IS c.ISBN,
+			KEY 'subject_num' IS c.subject_num,
+			KEY 'regist_date' IS c.regist_date
+			) "copy_data_json_object"
+		FROM copy_data c
+	</select>
+</mapper>
