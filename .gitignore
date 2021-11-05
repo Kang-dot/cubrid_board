@@ -68,6 +68,8 @@ local.properties
 ### Java ###
 # Compiled class file
 *.class
+*.MF
+*.properties
 
 # Log file
 *.log
@@ -85,4 +87,11 @@ local.properties
 *.ear
 *.zip
 *.tar.gz
-*.rar
+*.rar 
+© 2021 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
