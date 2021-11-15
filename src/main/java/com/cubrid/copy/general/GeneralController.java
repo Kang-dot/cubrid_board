@@ -20,4 +20,13 @@ public class GeneralController {
 		
 		return mav;
 	}
+	
+	@GetMapping("/batch")
+	public ModelAndView getOracleDataBatchList() {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/copy/generalResult");
+		mav.addObject("generalResult", generalServiceImpl.batchDataStart());
+		
+		return mav;
+	}
 }

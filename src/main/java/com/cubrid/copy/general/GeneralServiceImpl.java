@@ -2,6 +2,9 @@ package com.cubrid.copy.general;
 
 import java.util.List;
 
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,8 @@ public class GeneralServiceImpl implements GeneralService {
 	private GeneralMapper generalMapper;
 	@Autowired
 	private JsonMapper jsonMapper;
+	@Autowired
+	private SqlSessionFactory sqlSessionFactory;
 	
 	@Override
 	public CopyResult copyDataStart() {
@@ -32,6 +37,28 @@ public class GeneralServiceImpl implements GeneralService {
 				copyResult.setResult(true);
 			}
 		}
+		
+		long endTime = System.currentTimeMillis();
+		copyResult.setRunTime((endTime - startTime) / 1000);
+		
+		return copyResult;
+	}
+	
+	@Override
+	public CopyResult batchDataStart() {
+		CopyResult copyResult = new CopyResult();
+		
+		long startTime = System.currentTimeMillis();
+		
+		if (dropAndCreateTable()) {
+			List<OracleData> copyList = getCopyDataList();
+			copyResult.setDataCounts(copyList.size());
+			
+			if (registBatchData(copyList) && createIndex()) {
+				copyResult.setResult(true);
+			}
+		}
+		
 		long endTime = System.currentTimeMillis();
 		copyResult.setRunTime((endTime - startTime) / 1000);
 		
@@ -51,7 +78,7 @@ public class GeneralServiceImpl implements GeneralService {
 		
 		return copyList;
 	}
-
+	
 	@Override
 	public boolean registCopyData(List<OracleData> list) {
 		int count = 0;
@@ -67,11 +94,42 @@ public class GeneralServiceImpl implements GeneralService {
 				return true;
 			} else {
 				logger.info("registCopyData[" + list.size() + "] FAIL");
+				
 				return false;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 			return false;
+		}
+	}
+	
+	@Override
+	public boolean registBatchData(List<OracleData> list) {
+		SqlSession session = sqlSessionFactory.openSession(ExecutorType.BATCH, false);
+		GeneralMapper generalMapper = session.getMapper(GeneralMapper.class);
+		
+		int count = 0;
+		logger.info("registCopyData[" + list.size() + "] START");
+		try {
+			for (OracleData oracleData : list) {
+				generalMapper.regist(oracleData);
+				
+				if (count % 10000 == 0) {
+					session.commit();
+				}
+				count++;
+			}
+			
+			return true;
+		} catch (Exception e) {
+			session.rollback();
+			e.printStackTrace();
+			
+			return false;
+		} finally {
+			session.commit();
+			session.close();
 		}
 	}
 
@@ -87,6 +145,7 @@ public class GeneralServiceImpl implements GeneralService {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 			return false;
 		}
 	}
@@ -100,6 +159,7 @@ public class GeneralServiceImpl implements GeneralService {
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			
 			return false;
 		}
 	}

@@ -15,7 +15,7 @@
 	<!-- sql -->
 	<select id="list" resultMap="OracleDatatMap">
 		SELECT *
-		FROM copy_data
+		FROM copy_data_10
 	</select>
 	
 	<select id="jsonList" resultType="string">
@@ -29,6 +29,6 @@
 			KEY 'subject_num' IS c.subject_num,
 			KEY 'regist_date' IS c.regist_date
 			) "copy_data_json_object"
-		FROM copy_data c
+		FROM copy_data_10 c
 	</select>
 </mapper>
