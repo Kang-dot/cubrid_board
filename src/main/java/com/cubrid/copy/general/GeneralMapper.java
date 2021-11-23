@@ -8,7 +8,7 @@ import egovframework.rte.psl.dataaccess.mapper.Mapper;
 public interface GeneralMapper {
 	public OracleData select(OracleData oracleData) throws Exception;
 	
-	public List<OracleData> list() throws Exception;
+	public List<OracleData> list(String num) throws Exception;
 	
 	public int regist(OracleData oracleData) throws Exception;
 	
@@ -22,5 +22,5 @@ public interface GeneralMapper {
 	
 	public int createIndex() throws Exception;
 	
-	public int jsonOracleCopyData() throws Exception;
+	public int jsonOracleCopyData(String num) throws Exception;
 }

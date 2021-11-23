@@ -3,6 +3,7 @@ package com.cubrid.copy.json;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -13,10 +14,10 @@ public class JsonController {
 	private JsonServiceImpl jsonServiceImpl;
 	
 	@GetMapping("/json")
-	public ModelAndView getCopyJsonList() {
+	public ModelAndView getCopyJsonList(@RequestParam("num") String num) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/copy/jsonResult");
-		mav.addObject("jsonResult", jsonServiceImpl.copyDataStart());
+		mav.addObject("jsonResult", jsonServiceImpl.copyDataStart(num));
 
 		return mav;
 	}

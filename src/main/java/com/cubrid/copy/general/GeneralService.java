@@ -3,11 +3,11 @@ package com.cubrid.copy.general;
 import java.util.List;
 
 public interface GeneralService {
-	public CopyResult copyDataStart();
+	public CopyResult copyDataStart(String num);
 	
-	public CopyResult batchDataStart();
+	public CopyResult batchDataStart(String num);
 	
-	public List<OracleData> getCopyDataList();
+	public List<OracleData> getCopyDataList(String num);
 	
 	public boolean registCopyData(List<OracleData> list);
 	

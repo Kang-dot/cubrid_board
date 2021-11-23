@@ -5,17 +5,12 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
-		
-		<!-- sqlSessionFactory Bean -->
-		<bean id="sqlSessionFactory"
-			class="org.mybatis.spring.SqlSessionFactoryBean">
-			<property name="dataSource" ref="dataSource"/>
-		</bean>
 		
 		<!-- copy oracle mapper -->
 		<bean id="sqlSessionOracleCopy"
@@ -38,18 +33,28 @@
 		</bean>
 		
 		<!-- copy cubrid mapper -->
-		<bean id="sqlSessionCopy"
+		<tx:annotation-driven transaction-manager="transactionManager"/>
+		<tx:annotation-driven proxy-target-class="true"/>
+		
+		<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+			<constructor-arg index="0" ref="sqlSessionFactory" />
+			<constructor-arg index="1" value="BATCH" />
+		</bean>
+		
+		<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+			<property name="dataSource" ref="dataSource" />
+		</bean>
+		
+		<bean id="sqlSessionFactory"
 			class="org.mybatis.spring.SqlSessionFactoryBean">
 			<property name="dataSource" ref="dataSourceCopy" />
-			<property name="mapperLocations"
-				value="classpath:/com/cubrid/copy/general/*.xml"/>
+			<property name="mapperLocations" value="classpath:/com/cubrid/copy/general/*.xml"/>
 		</bean>
 		
 		<bean
 			class="egovframework.rte.psl.dataaccess.mapper.MapperConfigurer">
 			<property name="basePackage" value="com.cubrid.copy.general" />
-			<property name="sqlSessionFactoryBeanName"
-				value="sqlSessionCopy" />
+			<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 		</bean>
 
 		<bean id="dataSourceCopy"
