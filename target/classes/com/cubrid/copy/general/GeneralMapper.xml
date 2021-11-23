@@ -14,19 +14,28 @@
 
 	<!-- sql -->
 	<select id="select" parameterType="com.cubrid.copy.general.OracleData" resultMap="OracleDatatMap">
-		SELECT *
+		SELECT num, title, author, publisher, book_year, ISBN, subject_num, regist_date
 		FROM copy_data
 		WHERE NUM = #{num}
 	</select>
 	
-	<select id="list" resultMap="OracleDatatMap">
-		SELECT *
+	<select id="list" parameterType="string" resultMap="OracleDatatMap">
+		SELECT num, title, author, publisher, book_year, ISBN, subject_num, regist_date
 		FROM copy_data
+		WHERE num <![CDATA[<=]]> #{value}
 	</select>
 	
 	<insert id="regist" parameterType="com.cubrid.copy.general.OracleData">
-		INSERT INTO copy_data(NUM, TITLE, AUTHOR, PUBLISHER, BOOK_YEAR, ISBN, SUBJECT_NUM, REGIST_DATE)	
+		INSERT INTO copy_data(num, title, author, publisher, book_year, ISBN, subject_num, regist_date)	
 		VALUES(#{num}, #{title}, #{author}, #{publisher}, #{bookYear}, #{subjectNum}, #{ISBN}, #{registDate})
+	</insert>
+	
+	<insert id="registBatch" parameterType="java.util.List">
+		INSERT INTO copy_data(num, title, author, publisher, book_year, ISBN, subject_num, regist_date)
+		VALUES
+		<foreach collection="list" item="oracleData" separator=" , ">
+			(#{oracleData.num}, #{oracleData.title}, #{oracleData.author}, #{oracleData.publisher}, #{oracleData.bookYear}, #{oracleData.subjectNum}, #{oracleData.ISBN}, #{oracleData.registDate})
+		</foreach>
 	</insert> 
 	
 	<delete id="delete" parameterType="com.cubrid.copy.general.OracleData">
@@ -40,14 +49,14 @@
 	
 	<update id="createTable">
 		CREATE TABLE "copy_data" (
-			"NUM" int PRIMARY KEY,
-			"TITLE" varchar(500),
-			"AUTHOR" varchar(500),
-			"PUBLISHER" varchar(500),
-			"BOOK_YEAR" int,
-			"ISBN" varchar(50),
-			"SUBJECT_NUM" double,
-			"REGIST_DATE" date
+			"num" INT PRIMARY KEY,
+			"title" VARCHAR(500),
+			"author" VARCHAR(500),
+			"publisher" VARCHAR(500),
+			"book_year" INT,
+			"ISBN" VARCHAR(50),
+			"subject_num" DOUBLE,
+			"regist_date" DATE
 		)
 	</update>
 	
@@ -56,10 +65,28 @@
 		ON copy_data (title, ISBN)
 	</update>
 	
-	<insert id="jsonOracleCopyData">
-		INSERT INTO copy_data 
-		SELECT * FROM JSON_TABLE(
-			JSON_QUERY_LINK('select * from copy_data')
+	<insert id="jsonOracleCopyData" parameterType="string">
+		INSERT INTO copy_data (num, title, author, publisher, book_year, ISBN, subject_num, regist_date)
+		SELECT num
+			   , title
+			   , author
+			   , publisher
+			   , book_year
+			   , ISBN
+			   , subject_num
+			   , regist_date 
+		FROM JSON_TABLE(
+			JSON_QUERY_LINK('SELECT 
+								num
+								, title
+								, author
+								, publisher
+								, book_year
+								, ISBN
+								, subject_num
+								, regist_date
+							FROM copy_data
+							WHERE num <![CDATA[<=]]> ${value}')
 						,'$.*' COLUMNS (NESTED PATH '$' COLUMNS (NUM int path '$.c1'
 																, TITLE varchar path '$.c2'
 																, AUTHOR varchar path '$.c3'

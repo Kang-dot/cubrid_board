@@ -13,9 +13,10 @@
 	</resultMap>
 	
 	<!-- sql -->
-	<select id="list" resultMap="OracleDatatMap">
-		SELECT *
+	<select id="list" parameterType="string" resultMap="OracleDatatMap">
+		SELECT num, title, author, publisher, book_year, ISBN, subject_num, regist_date
 		FROM copy_data
+		WHERE num <![CDATA[<=]]> #{value}
 	</select>
 	
 	<select id="jsonList" resultType="string">
