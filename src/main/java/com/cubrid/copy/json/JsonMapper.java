@@ -8,7 +8,7 @@ import egovframework.rte.psl.dataaccess.mapper.Mapper;
 
 @Mapper
 public interface JsonMapper {
-	public List<OracleData> list() throws Exception; 
+	public List<OracleData> list(String num) throws Exception; 
 	
 	public List<String> jsonList() throws Exception;
 }
