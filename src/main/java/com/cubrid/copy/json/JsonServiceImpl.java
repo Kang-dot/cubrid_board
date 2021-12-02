@@ -16,13 +16,13 @@ public class JsonServiceImpl implements JsonService {
 	private GeneralMapper generalMapper;
 
 	@Override
-	public CopyResult copyDataStart() {
+	public CopyResult copyDataStart(String num) {
 		CopyResult copyResult = new CopyResult();
 		
 		long startTime  = System.currentTimeMillis();
 		
 		if (dropAndCreateTable()) {
-			int insertCount = readAndInsertOracleData();
+			int insertCount = readAndInsertOracleData(num);
 			
 			if (insertCount > 0 && createIndex()) {
 				copyResult.setDataCounts(insertCount);
@@ -34,15 +34,17 @@ public class JsonServiceImpl implements JsonService {
 		long resultTime = (endTime - startTime) / 1000;
 		copyResult.setRunTime(resultTime);
 		
+		logger.info("RunTime[" + resultTime + "]");
+		
 		return copyResult;
 	}
 	
 	@Override
-	public int readAndInsertOracleData() {
+	public int readAndInsertOracleData(String num) {
 		int insertCount = 0;
 		
 		try {
-			insertCount = generalMapper.jsonOracleCopyData();
+			insertCount = generalMapper.jsonOracleCopyData(num);
 			logger.info("registCopyData[" + insertCount + "]");
 		} catch (Exception e) {
 			e.printStackTrace();
